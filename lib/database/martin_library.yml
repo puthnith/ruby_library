@@ -14,9 +14,9 @@
 - :item:
     :title: A Storm of Swords
     :author: George R. R. Martin
-  :available: false
-  :return_date: 2020-12-01
-  :borrower_name: Sofia
+  :available: true
+  :return_date:
+  :borrower_name:
 - :item:
     :title: A Feast for Crows
     :author: George R. R. Martin

@@ -62,6 +62,7 @@ class Library
     @books.each do |book|
       book[:available] = true
       book[:return_date] = nil
+      book[:borrower_name] = nil
     end
     update_database
   end
@@ -69,11 +70,11 @@ class Library
   private
 
   def search_book_title(title, books)
-    books.select { |book| book[:item][:title].include? title }
+    books.select { |book| book[:item][:title].downcase.include? title.downcase }
   end
 
   def search_book_author(author, books)
-    books.select { |book| book[:item][:author].include? author }
+    books.select { |book| book[:item][:author].downcase.include? author.downcase }
   end
 
   def assert_request_title request

@@ -1,3 +1,4 @@
+require './lib/visitor.rb'
 require './lib/library.rb'
 
 describe Library do
@@ -11,7 +12,8 @@ describe Library do
         author: 'George R. R. Martin'
       },
       available: true,
-      return_date: nil
+      return_date: nil,
+      borrower_name: nil
     }
   }
 
@@ -22,7 +24,8 @@ describe Library do
         author: 'J.K. Rowling'
       },
       available: true,
-      return_date: nil
+      return_date: nil,
+      borrower_name: nil
     }
   }
 
@@ -33,7 +36,8 @@ describe Library do
         author: 'J.K. Rowling'
       },
       available: true,
-      return_date: nil
+      return_date: nil,
+      borrower_name: nil
     }
   }
 
@@ -161,9 +165,11 @@ describe Library do
   it 'is able to reset all books to be available and save to database' do
     books[0][:available] = false
     books[0][:return_date] = Date.today.next_month(1)
+    books[0][:borrower_name] = 'Any'
 
     books[1][:available] = false
-    books[2][:return_date] = Date.today.next_month(1)
+    books[1][:return_date] = Date.today.next_month(1)
+    books[1][:borrower_name] = 'Any'
 
     expect(File).to receive(:open).with(filepath, 'w')
     subject.reset
@@ -171,13 +177,15 @@ describe Library do
     expect(subject.books[0]).to eq ({
       item: books[0][:item],
       available: true,
-      return_date: nil
+      return_date: nil,
+      borrower_name: nil
     })
 
     expect(subject.books[1]).to eq ({
       item: books[1][:item],
       available: true,
-      return_date: nil
+      return_date: nil,
+      borrower_name: nil
     })
   end
 end

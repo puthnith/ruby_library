@@ -3,14 +3,35 @@
 ## Install
 
 ```none
-💎 gem install bundler
-💎 bundle install
+💎  gem install bundler
+💎  bundle install
+```
+
+## App
+
+```none
+🚀  ruby ./lib/app.rb
+
+💎 Welcome to Library App 💎
+  👉 2 vistors, Sofia and Vistor
+  👉 2 libraries, Rowling and Martin
+  👉 Search library's books by title
+  👉 Borrow an available book from a library for a visitor
+  👉 Return a borrowed book to a library for a visitor
+  👉 View a vistor, a library or everyone's books
+
+Option? (Press ↑/↓ arrow to move and Enter to select)
+‣ show
+  search
+  borrow a book
+  return a book
+  exit
 ```
 
 ## Unit Tests
 
 ```none
-🧪 rspec
+🧪  rspec
 
 Library
   is expected to load books from YAML file on initialized
@@ -59,7 +80,7 @@ Finished in 0.03548 seconds (files took 0.16787 seconds to load)
 ## Simulation
 
 ```none
-💎 ruby './lib/index.rb'
+🚀  ruby './lib/index.rb'
 
 --- Sofia's books ---
 # sofia.books
