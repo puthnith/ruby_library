@@ -8,12 +8,23 @@ class Visitor
     @books = []
   end
 
-  def borrow args
+  def borrow_book args
     library = assert_library(args[:library])
     title = assert_items(args[:title])
     result = library.checkout(title: title, visitor: self)
     if result[:status] then
       @books << result[:book]
+    end
+    result[:message]
+  end
+
+  def return_book args
+    library = assert_library(args[:library])
+    title = assert_items(args[:title])
+    result = library.checkin(title: title, visitor: self)
+    if result[:status] then
+      # @books.delete_at(@books.find_index { |book| book[:title] == title })
+      @books = @books.reject { |book| book[:title] == title }
     end
     result[:message]
   end

@@ -75,42 +75,83 @@ describe Library do
     expect(subject.list_of_books).to eq books
   end
 
-  describe 'is expected to provide Visitor' do
-    let (:visitor) { Visitor.new("Name") }
+  describe 'is expected for visitors to' do
+    let (:name) { "Visitor" }
+    let (:visitor) { Visitor.new(name) }
 
-    it 'an error if no title' do
-      command = lambda { subject.checkout({}) }
-      expect(command).to raise_error('A title is required')
+    describe 'checkout and get' do
+      it 'an error if no title' do
+        command = lambda { subject.checkout({}) }
+        expect(command).to raise_error('A title is required')
+      end
+
+      it 'an error if no visitor' do
+        command = lambda { subject.checkout({title: 'Title'}) }
+        expect(command).to raise_error('A visitor is required')
+      end
+
+      it 'not found if title of book does not exist' do
+        expected = { status: false, message: 'not found' }
+        expect(subject.checkout(title: 'Title', visitor: visitor)).to eq expected
+      end
+
+      it 'not available if title of book is not available' do
+        subject.books[0][:available] = false
+        subject.books[0][:return_date] = Date.today.next_month(1)
+        expected = { status: false, message: 'not available' }
+        expect(subject.checkout(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
+      end
+
+      it 'book as database is updated if title of book exists' do
+        book = {
+          title: book1[:item][:title],
+          author: book1[:item][:author],
+          return_date: Date.today.next_month(1)
+        }
+        expected = { status: true, message: 'success', book: book }
+        expect(File).to receive(:open).with(Library::LIBRARY_FILE, 'w')
+        expect(subject.checkout(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
+        expect(subject.books[0][:available]).to eq false
+        expect(subject.books[0][:return_date]).to eq Date.today.next_month(1)
+      end
     end
 
-    it 'an error if no visitor' do
-      command = lambda { subject.checkout({title: 'Title'}) }
-      expect(command).to raise_error('A visitor is required')
-    end
+    describe 'checkin and get' do
+      it 'an error if no title' do
+        command = lambda { subject.checkin({}) }
+        expect(command).to raise_error('A title is required')
+      end
 
-    it 'not found if title of book does not exist' do
-      expected = { status: false, message: 'not found' }
-      expect(subject.checkout(title: 'Title', visitor: visitor)).to eq expected
-    end
+      it 'an error if no visitor' do
+        command = lambda { subject.checkin({title: 'Title'}) }
+        expect(command).to raise_error('A visitor is required')
+      end
 
-    it 'not available if title of book is not available' do
-      book1[:available] = false
-      subject.books[0][:return_date] = Date.today.next_month(1)
-      expected = { status: false, message: 'not available' }
-      expect(subject.checkout(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
-    end
+      it 'not found if title of book does not exist' do
+        expected = { status: false, message: 'not found' }
+        expect(subject.checkin(title: 'Title', visitor: visitor)).to eq expected
+      end
 
-    it 'book and update database if title of book exists' do
-      book = {
-        title: book1[:item][:title],
-        author: book1[:item][:author],
-        return_date: Date.today.next_month(1)
-      }
-      expected = { status: true, message: 'success', book: book }
-      expect(File).to receive(:open).with(Library::LIBRARY_FILE, 'w')
-      expect(subject.checkout(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
-      expect(subject.books[0][:available]).to eq false
-      expect(subject.books[0][:return_date]).to eq Date.today.next_month(1)
+      it 'not borrowed if title of book is not borrowed by him' do
+        subject.books[0][:available] = false
+        subject.books[0][:return_date] = Date.today.next_month(1)
+        subject.books[0][:borrower_name] = 'Unknown'
+        expected = { status: false, message: 'not borrowed' }
+        expect(subject.checkin(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
+        expect(subject.checkin(title: 'Harry Potter and the Goblet of Fire', visitor: visitor)).to eq expected
+      end
+
+      it 'success as database is updated if title of book is borrowed by him' do
+        subject.books[0][:available] = false
+        subject.books[0][:return_date] = Date.today.next_month(1)
+        subject.books[0][:borrower_name] = name
+        expected = { status: true, message: 'success', book: nil }
+        expect(File).to receive(:open).with(Library::LIBRARY_FILE, 'w')
+        expect(subject.checkin(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
+        expect(subject.books[0][:available]).to eq true
+        expect(subject.books[0][:return_date]).to eq nil
+        expect(subject.books[0][:borrower_name]).to eq nil
+      end
     end
   end
 

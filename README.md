@@ -20,25 +20,40 @@ Library
   returns empty array if no title or author provided to search
   is expected to provide a list of books to visitors
   is able to reset all books to be available and save to database
-  is expected to provide Visitor
-    an error if no title
-    an error if no visitor
-    not found if title of book does not exist
-    not available if title of book is not available
-    book and update database if title of book exists
+  is expected for visitors to
+    checkout and get
+      an error if no title
+      an error if no visitor
+      not found if title of book does not exist
+      not available if title of book is not available
+      book as database is updated if title of book exists
+    checkin and get
+      an error if no title
+      an error if no visitor
+      not found if title of book does not exist
+      not borrowed if title of book is not borrowed by him
+      success as database is updated if title of book is borrowed by him
 
 Visitor
   is expected to have a name on initialize
   is expected to have empty books list on initialize
-  is expected to raise error if no library
-  is expected to raise error if no title
-  is expected to return message if given library and a title
-  is expected to call :checkout from library
-  is expected to update the visitor's books upon success
-  is expected to do nothing to the visitor's books upon failure
+  can borrow book as he
+    raises error if no library
+    raises error if no title
+    returns message if given library and a title
+    calls checkout to library
+    updates his books upon success
+    does nothing to his books upon failure
+  can return book as he
+    raises error if no library
+    raises error if no title
+    returns message if given library and a title
+    calls checkin to library
+    updates his books upon success
+    does nothing to his books upon failure
 
-Finished in 0.03409 seconds (files took 0.15077 seconds to load)
-20 examples, 0 failures
+Finished in 0.06083 seconds (files took 0.17262 seconds to load)
+31 examples, 0 failures
 ```
 
 ## Simulation
@@ -70,13 +85,13 @@ Finished in 0.03409 seconds (files took 0.15077 seconds to load)
    {:title=>"Harry Potter and the Goblet of Fire", :author=>"J.K. Rowling"},
   :available=>true,
   :return_date=>nil,
-  :borrower_name=>"Martin"},
+  :borrower_name=>nil},
  {:item=>
    {:title=>"Harry Potter and the Order of the Phoenix",
     :author=>"J.K. Rowling"},
   :available=>true,
   :return_date=>nil,
-  :borrower_name=>"Martin"},
+  :borrower_name=>"Sofia"},
  {:item=>
    {:title=>"Harry Potter and the Half-Blood Prince", :author=>"J.K. Rowling"},
   :available=>true,
@@ -86,10 +101,14 @@ Finished in 0.03409 seconds (files took 0.15077 seconds to load)
    {:title=>"Harry Potter and the Deathly Hallows", :author=>"J.K. Rowling"},
   :available=>true,
   :return_date=>nil,
-  :borrower_name=>nil}]
+  :borrower_name=>"Martin"}]
 
---- Visitor's books ---
-# visitor.books
+--- Sofia's books ---
+# sofia.books
+[]
+
+--- Martin's books ---
+# martin.books
 []
 
 --- Search "Fire" ---
@@ -98,18 +117,22 @@ Finished in 0.03409 seconds (files took 0.15077 seconds to load)
    {:title=>"Harry Potter and the Goblet of Fire", :author=>"J.K. Rowling"},
   :available=>true,
   :return_date=>nil,
-  :borrower_name=>"Martin"}]
+  :borrower_name=>nil}]
 
---- Visitor borrows "Harry Potter and the Goblet of Fire" ---
-# visitor.borrow(title: 'Harry Potter and the Goblet of Fire', library: library)
+--- Sofia borrows "Harry Potter and the Goblet of Fire" ---
+# sofia.borrow_book(title: 'Harry Potter and the Goblet of Fire', library: library)
 "success"
 
---- Visitor borrows "Harry Potter and the Order of the Phoenix" ---
-# visitor.borrow(title: 'Harry Potter and the Order of the Phoenix', library: library)
+--- Sofia borrows "Harry Potter and the Order of the Phoenix" ---
+# sofia.borrow_book(title: 'Harry Potter and the Order of the Phoenix', library: library)
 "success"
 
---- Visitor's books ---
-# visitor.books
+--- Martin borrows "Harry Potter and the Deathly Hallows" ---
+# martin.borrow_book(title: 'Harry Potter and the Deathly Hallows', library: library)
+"success"
+
+--- Sofia's books ---
+# sofia.books
 [{:title=>"Harry Potter and the Goblet of Fire",
   :author=>"J.K. Rowling",
   :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>},
@@ -117,16 +140,26 @@ Finished in 0.03409 seconds (files took 0.15077 seconds to load)
   :author=>"J.K. Rowling",
   :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>}]
 
---- Visitor borrows "Harry Potter and the Goblet of Fire" again ---
-# visitor.borrow(title: 'Harry Potter and the Goblet of Fire', library: library)
+--- Martin's books ---
+# martin.books
+[{:title=>"Harry Potter and the Deathly Hallows",
+  :author=>"J.K. Rowling",
+  :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>}]
+
+--- Sofia borrows "Harry Potter and the Goblet of Fire" again ---
+# sofia.borrow_book(title: 'Harry Potter and the Goblet of Fire', library: library)
 "not available"
 
---- Visitor borrows "Men without Women" ---
-# visitor.borrow(title: 'Men without Women', library: library)
+--- Sofia borrows "Harry Potter and the Deathly Hallows" which was borrowed by Martin ---
+# sofia.borrow_book(title: 'Harry Potter and the Deathly Hallows', library: library)
+"not available"
+
+--- Sofia borrows "Men without Women" which does not exist ---
+# sofia.borrow_book(title: 'Men without Women', library: library)
 "not found"
 
---- Visitor's books ---
-# visitor.books
+--- Sofia's books ---
+# sofia.books
 [{:title=>"Harry Potter and the Goblet of Fire",
   :author=>"J.K. Rowling",
   :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>},
@@ -135,7 +168,7 @@ Finished in 0.03409 seconds (files took 0.15077 seconds to load)
   :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>}]
 
 --- Books in the library ---
-# visitor.books
+# library.list_of_books
 [{:item=>
    {:title=>"Harry Potter and the Philosopher's Stone",
     :author=>"J.K. Rowling"},
@@ -158,13 +191,13 @@ Finished in 0.03409 seconds (files took 0.15077 seconds to load)
    {:title=>"Harry Potter and the Goblet of Fire", :author=>"J.K. Rowling"},
   :available=>false,
   :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>,
-  :borrower_name=>"Martin"},
+  :borrower_name=>"Sofia"},
  {:item=>
    {:title=>"Harry Potter and the Order of the Phoenix",
     :author=>"J.K. Rowling"},
   :available=>false,
   :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>,
-  :borrower_name=>"Martin"},
+  :borrower_name=>"Sofia"},
  {:item=>
    {:title=>"Harry Potter and the Half-Blood Prince", :author=>"J.K. Rowling"},
   :available=>true,
@@ -172,7 +205,73 @@ Finished in 0.03409 seconds (files took 0.15077 seconds to load)
   :borrower_name=>nil},
  {:item=>
    {:title=>"Harry Potter and the Deathly Hallows", :author=>"J.K. Rowling"},
+  :available=>false,
+  :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>,
+  :borrower_name=>"Martin"}]
+
+--- Martin returns "Harry Potter and the Goblet of Fire" which is not borrowed by him ---
+# martin.return_book(title: 'Harry Potter and the Goblet of Fire', library: library)
+"not borrowed"
+
+--- Martin returns "Harry Potter and the Half-Blood Prince" which is available in library ---
+# martin.return_book(title: 'Harry Potter and the Half-Blood Prince', library: library)
+"not borrowed"
+
+--- Sofia returns "Harry Potter and the Goblet of Fire" which is borrowed by her ---
+# sofia.return_book(title: 'Harry Potter and the Goblet of Fire', library: library)
+"success"
+
+--- Sofia's books ---
+# sofia.books
+[{:title=>"Harry Potter and the Order of the Phoenix",
+  :author=>"J.K. Rowling",
+  :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>}]
+
+--- Martin's books ---
+# martin.books
+[{:title=>"Harry Potter and the Deathly Hallows",
+  :author=>"J.K. Rowling",
+  :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>}]
+
+--- Books in the library ---
+# library.list_of_books
+[{:item=>
+   {:title=>"Harry Potter and the Philosopher's Stone",
+    :author=>"J.K. Rowling"},
   :available=>true,
   :return_date=>nil,
-  :borrower_name=>nil}]
+  :borrower_name=>nil},
+ {:item=>
+   {:title=>"Harry Potter and the Chamber of Secrets",
+    :author=>"J.K. Rowling"},
+  :available=>true,
+  :return_date=>nil,
+  :borrower_name=>nil},
+ {:item=>
+   {:title=>"Harry Potter and the Prisoner of Azkaban",
+    :author=>"J.K. Rowling"},
+  :available=>true,
+  :return_date=>nil,
+  :borrower_name=>nil},
+ {:item=>
+   {:title=>"Harry Potter and the Goblet of Fire", :author=>"J.K. Rowling"},
+  :available=>true,
+  :return_date=>nil,
+  :borrower_name=>nil},
+ {:item=>
+   {:title=>"Harry Potter and the Order of the Phoenix",
+    :author=>"J.K. Rowling"},
+  :available=>false,
+  :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>,
+  :borrower_name=>"Sofia"},
+ {:item=>
+   {:title=>"Harry Potter and the Half-Blood Prince", :author=>"J.K. Rowling"},
+  :available=>true,
+  :return_date=>nil,
+  :borrower_name=>nil},
+ {:item=>
+   {:title=>"Harry Potter and the Deathly Hallows", :author=>"J.K. Rowling"},
+  :available=>false,
+  :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>,
+  :borrower_name=>"Martin"}]
 ```

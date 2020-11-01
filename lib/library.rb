@@ -34,12 +34,27 @@ class Library
     book = fetch_book(request[:title])
     if found_book?(book) then
       return failure_payload('not found')
-    elsif available_book?(book) then
+    elsif not_available_book?(book) then
       return failure_payload('not available')
     else
       checkout_book = perform_checkout(book, request[:visitor].name)
       update_database
       return success_payload(checkout_book)
+    end
+  end
+
+  def checkin request
+    assert_request_title(request)
+    assert_request_visitor(request)
+    book = fetch_book(request[:title])
+    if found_book?(book) then
+      return failure_payload('not found')
+    elsif not_borrowed_book?(book, request[:visitor]) then
+      return failure_payload('not borrowed')
+    else
+      checkout_book = perform_checkin(book)
+      update_database
+      return success_payload(nil)
     end
   end
 
@@ -77,8 +92,12 @@ class Library
     book == nil
   end
 
-  def available_book?(book)
+  def not_available_book?(book)
     book[:available] == false
+  end
+
+  def not_borrowed_book?(book, visitor)
+    book[:available] || book[:borrower_name] != visitor.name
   end
 
   def failure_payload(message)
@@ -98,6 +117,12 @@ class Library
       author: book[:item][:author],
       return_date: book[:return_date]
     }
+  end
+
+  def perform_checkin(book)
+    book[:available] = true
+    book[:return_date] = nil
+    book[:borrower_name] = nil
   end
 
   def update_database
