@@ -28,14 +28,16 @@ class Library
     @books
   end
 
-  def checkout(title)
-    book = fetch_book(title)
+  def checkout request
+    assert_request_title(request)
+    assert_request_visitor(request)
+    book = fetch_book(request[:title])
     if found_book?(book) then
       return failure_payload('not found')
     elsif available_book?(book) then
       return failure_payload('not available')
     else
-      checkout_book = perform_checkout(book)
+      checkout_book = perform_checkout(book, request[:visitor].name)
       update_database
       return success_payload(checkout_book)
     end
@@ -59,6 +61,14 @@ class Library
     books.select { |book| book[:item][:author].include? author }
   end
 
+  def assert_request_title request
+    raise "A title is required" if not request[:title]
+  end
+
+  def assert_request_visitor request
+    raise "A visitor is required" if not request[:visitor]
+  end
+
   def fetch_book(title)
     @books.detect { |book| book[:item][:title] == title }
   end
@@ -79,9 +89,10 @@ class Library
     { status: true, message: 'success', book: book }
   end
 
-  def perform_checkout(book)
+  def perform_checkout(book, name)
     book[:available] = false
     book[:return_date] = Date.today.next_month(1)
+    book[:borrower_name] = name
     {
       title: book[:item][:title],
       author: book[:item][:author],

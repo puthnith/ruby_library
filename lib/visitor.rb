@@ -1,16 +1,17 @@
 require 'date'
 
 class Visitor
-  attr_accessor :books
+  attr_accessor :name, :books
 
-  def initialize
+  def initialize name
+    @name = name
     @books = []
   end
 
   def borrow args
     library = assert_library(args[:library])
     title = assert_items(args[:title])
-    result = library.checkout(title)
+    result = library.checkout(title: title, visitor: self)
     if result[:status] then
       @books << result[:book]
     end

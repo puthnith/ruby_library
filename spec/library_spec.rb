@@ -75,31 +75,43 @@ describe Library do
     expect(subject.list_of_books).to eq books
   end
 
-  it 'is expected to return not found if title of book does not exist' do
-    expected = { status: false, message: 'not found' }
-    expect(subject.checkout('Title')).to eq expected
-  end
+  describe 'is expected to provide Visitor' do
+    let (:visitor) { Visitor.new("Name") }
 
-  it 'is expected to return not available if title of book is not available' do
-    book1[:available] = false
-    subject.books[0][:return_date] = Date.today.next_month(1)
-    expected = { status: false, message: 'not available' }
-    expect(subject.checkout('A Song of Ice and Fire')).to eq expected
-  end
+    it 'an error if no title' do
+      command = lambda { subject.checkout({}) }
+      expect(command).to raise_error('A title is required')
+    end
 
-  it 'is expected to return book and update database if title of book exists' do
-    book = {
-      title: book1[:item][:title],
-      author: book1[:item][:author],
-      return_date: Date.today.next_month(1)
-    }
-    expected = { status: true, message: 'success', book: book }
+    it 'an error if no visitor' do
+      command = lambda { subject.checkout({title: 'Title'}) }
+      expect(command).to raise_error('A visitor is required')
+    end
 
-    expect(File).to receive(:open).with(Library::LIBRARY_FILE, 'w')
-    expect(subject.checkout('A Song of Ice and Fire')).to eq expected
-    expect(subject.books[0][:available]).to eq false
-    expect(subject.books[0][:return_date]).to eq Date.today.next_month(1)
+    it 'not found if title of book does not exist' do
+      expected = { status: false, message: 'not found' }
+      expect(subject.checkout(title: 'Title', visitor: visitor)).to eq expected
+    end
 
+    it 'not available if title of book is not available' do
+      book1[:available] = false
+      subject.books[0][:return_date] = Date.today.next_month(1)
+      expected = { status: false, message: 'not available' }
+      expect(subject.checkout(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
+    end
+
+    it 'book and update database if title of book exists' do
+      book = {
+        title: book1[:item][:title],
+        author: book1[:item][:author],
+        return_date: Date.today.next_month(1)
+      }
+      expected = { status: true, message: 'success', book: book }
+      expect(File).to receive(:open).with(Library::LIBRARY_FILE, 'w')
+      expect(subject.checkout(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
+      expect(subject.books[0][:available]).to eq false
+      expect(subject.books[0][:return_date]).to eq Date.today.next_month(1)
+    end
   end
 
   it 'is able to reset all books to be available and save to database' do

@@ -1,12 +1,17 @@
 require './lib/visitor.rb'
 
 describe Visitor do
+  let(:name) { "Reaksa" }
   let(:library) { instance_double('Library') }
-  subject { Visitor.new }
+  subject { Visitor.new(name) }
 
   before do
     not_available = { status: false, message: 'not available' }
     allow(library).to receive(:checkout).and_return(not_available)
+  end
+
+  it 'is expected to have a name on initialize' do
+    expect(subject.name).to eq name
   end
 
   it 'is expected to have empty books list on initialize' do
@@ -27,28 +32,29 @@ describe Visitor do
 
   it 'is expected to call :checkout from library' do
     title = 'Title'
-    expect(library).to receive(:checkout).with(title)
+    expect(library).to receive(:checkout).with({title: title, visitor: subject})
     subject.borrow(title: title, library: library)
   end
 
   it 'is expected to update the visitor\'s books upon success' do
     book = {
-      title: "Title",
-      author: "Author",
+      title: 'Title',
+      author: 'Author',
       return_date: Date.today.next_month(1)
     }
     expected_books = subject.books + [book]
     success = { status: true, message: 'success', book: book }
-    allow(library).to receive(:checkout).and_return(success)
+    allow(library).to receive(:checkout).with({title: book[:title], visitor: subject}).and_return(success)
     subject.borrow(title: book[:title], library: library)
     expect(subject.books).to eq expected_books
   end
 
   it 'is expected to do nothing to the visitor\'s books upon failure' do
+    title = 'Title'
     expected_books = subject.books
     failure = { status: false, message: 'not available' }
-    allow(library).to receive(:checkout).and_return(failure)
-    subject.borrow(title: 'Title', library: library)
+    allow(library).to receive(:checkout).with({title: title, visitor: subject}).and_return(failure)
+    subject.borrow(title: title, library: library)
     expect(subject.books).to eq expected_books
   end
 end
