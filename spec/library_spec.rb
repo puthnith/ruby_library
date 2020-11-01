@@ -1,6 +1,9 @@
 require './lib/library.rb'
 
 describe Library do
+  let (:filepath) { 'any_filepath' }
+  subject { Library.new(filepath) }
+
   let (:book1) {
     {
       item: {
@@ -46,8 +49,8 @@ describe Library do
   end
 
   it 'is expected to load books from YAML file on initialized' do
-    allow(YAML).to receive(:load_file).with(Library::LIBRARY_FILE).and_return(books)
-    library = Library.new
+    allow(YAML).to receive(:load_file).with(filepath).and_return(books)
+    library = Library.new filepath
     expect(library.books).to eq books
   end
 
@@ -96,8 +99,8 @@ describe Library do
       end
 
       it 'not available if title of book is not available' do
-        subject.books[0][:available] = false
-        subject.books[0][:return_date] = Date.today.next_month(1)
+        books[0][:available] = false
+        books[0][:return_date] = Date.today.next_month(1)
         expected = { status: false, message: 'not available' }
         expect(subject.checkout(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
       end
@@ -109,10 +112,10 @@ describe Library do
           return_date: Date.today.next_month(1)
         }
         expected = { status: true, message: 'success', book: book }
-        expect(File).to receive(:open).with(Library::LIBRARY_FILE, 'w')
+        expect(File).to receive(:open).with(filepath, 'w')
         expect(subject.checkout(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
-        expect(subject.books[0][:available]).to eq false
-        expect(subject.books[0][:return_date]).to eq Date.today.next_month(1)
+        expect(books[0][:available]).to eq false
+        expect(books[0][:return_date]).to eq Date.today.next_month(1)
       end
     end
 
@@ -133,20 +136,20 @@ describe Library do
       end
 
       it 'not borrowed if title of book is not borrowed by him' do
-        subject.books[0][:available] = false
-        subject.books[0][:return_date] = Date.today.next_month(1)
-        subject.books[0][:borrower_name] = 'Unknown'
+        books[0][:available] = false
+        books[0][:return_date] = Date.today.next_month(1)
+        books[0][:borrower_name] = 'Unknown'
         expected = { status: false, message: 'not borrowed' }
         expect(subject.checkin(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
         expect(subject.checkin(title: 'Harry Potter and the Goblet of Fire', visitor: visitor)).to eq expected
       end
 
       it 'success as database is updated if title of book is borrowed by him' do
-        subject.books[0][:available] = false
-        subject.books[0][:return_date] = Date.today.next_month(1)
-        subject.books[0][:borrower_name] = name
+        books[0][:available] = false
+        books[0][:return_date] = Date.today.next_month(1)
+        books[0][:borrower_name] = name
         expected = { status: true, message: 'success', book: nil }
-        expect(File).to receive(:open).with(Library::LIBRARY_FILE, 'w')
+        expect(File).to receive(:open).with(filepath, 'w')
         expect(subject.checkin(title: 'A Song of Ice and Fire', visitor: visitor)).to eq expected
         expect(subject.books[0][:available]).to eq true
         expect(subject.books[0][:return_date]).to eq nil
@@ -156,23 +159,23 @@ describe Library do
   end
 
   it 'is able to reset all books to be available and save to database' do
-    subject.books[0][:available] = false
-    subject.books[0][:return_date] = Date.today.next_month(1)
+    books[0][:available] = false
+    books[0][:return_date] = Date.today.next_month(1)
 
-    subject.books[1][:available] = false
-    subject.books[2][:return_date] = Date.today.next_month(1)
+    books[1][:available] = false
+    books[2][:return_date] = Date.today.next_month(1)
 
-    expect(File).to receive(:open).with(Library::LIBRARY_FILE, 'w')
+    expect(File).to receive(:open).with(filepath, 'w')
     subject.reset
 
     expect(subject.books[0]).to eq ({
-      item: subject.books[0][:item],
+      item: books[0][:item],
       available: true,
       return_date: nil
     })
 
     expect(subject.books[1]).to eq ({
-      item: subject.books[1][:item],
+      item: books[1][:item],
       available: true,
       return_date: nil
     })

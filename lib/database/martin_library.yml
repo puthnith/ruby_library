@@ -1,0 +1,43 @@
+---
+- :item:
+    :title: A Game of Thrones
+    :author: George R. R. Martin
+  :available: true
+  :return_date:
+  :borrower_name:
+- :item:
+    :title: A Clash of Kings
+    :author: George R. R. Martin
+  :available: true
+  :return_date:
+  :borrower_name:
+- :item:
+    :title: A Storm of Swords
+    :author: George R. R. Martin
+  :available: false
+  :return_date: 2020-12-01
+  :borrower_name: Sofia
+- :item:
+    :title: A Feast for Crows
+    :author: George R. R. Martin
+  :available: true
+  :return_date:
+  :borrower_name:
+- :item:
+    :title: A Dance with Dragons
+    :author: George R. R. Martin
+  :available: true
+  :return_date:
+  :borrower_name:
+- :item:
+    :title: The Winds of Winter
+    :author: George R. R. Martin
+  :available: true
+  :return_date:
+  :borrower_name:
+- :item:
+    :title: A Dream of Spring
+    :author: George R. R. Martin
+  :available: true
+  :return_date:
+  :borrower_name:

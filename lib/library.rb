@@ -2,12 +2,12 @@ require 'yaml'
 require 'date'
 
 class Library
-  LIBRARY_FILE = './lib/data.yml'
-
+  attr_reader :filepath
   attr_accessor :books
 
-  def initialize
-    @books = YAML.load_file(LIBRARY_FILE)
+  def initialize filepath
+    @filepath = filepath
+    @books = YAML.load_file(filepath)
   end
 
   def search by
@@ -126,6 +126,6 @@ class Library
   end
 
   def update_database
-    File.open(LIBRARY_FILE, 'w') { |file| file.write(@books.to_yaml) }
+    File.open(filepath, 'w') { |file| file.write(@books.to_yaml) }
   end
 end
