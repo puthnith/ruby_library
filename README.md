@@ -43,6 +43,7 @@ Finished in 0.03219 seconds (files took 0.15021 seconds to load)
 💎 ruby './lib/index.rb'
 
 --- Books in the library ---
+# library.list_of_books
 [{:item=>
    {:title=>"Harry Potter and the Philosopher's Stone",
     :author=>"J.K. Rowling"},
@@ -77,37 +78,52 @@ Finished in 0.03219 seconds (files took 0.15021 seconds to load)
   :return_date=>nil}]
 
 --- Visitor's books ---
+# visitor.books
 []
 
 --- Search "Fire" ---
+# library.search(title: "Fire")
 [{:item=>
    {:title=>"Harry Potter and the Goblet of Fire", :author=>"J.K. Rowling"},
   :available=>true,
   :return_date=>nil}]
 
---- Borrow "Harry Potter and the Goblet of Fire" ---
+--- Visitor borrows "Harry Potter and the Goblet of Fire" ---
+# visitor.borrow(title: "Harry Potter and the Goblet of Fire", library: library)
 "success"
 
---- Visitor borrows "Harry Potter and the Goblet of Fire" ---
-"not available"
+--- Visitor borrows "Harry Potter and the Order of the Phoenix" ---
+# visitor.borrow(title: "Harry Potter and the Order of the Phoenix", library: library)
+"success"
 
 --- Visitor's books ---
+# visitor.books
 [{:title=>"Harry Potter and the Goblet of Fire",
+  :author=>"J.K. Rowling",
+  :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>},
+ {:title=>"Harry Potter and the Order of the Phoenix",
   :author=>"J.K. Rowling",
   :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>}]
 
 --- Visitor borrows "Harry Potter and the Goblet of Fire" again ---
+# visitor.borrow(title: "Harry Potter and the Goblet of Fire", library: library)
 "not available"
 
 --- Visitor borrows "Men without Women" ---
+# visitor.borrow(title: "Men without Women", library: library)
 "not found"
 
 --- Visitor's books ---
+# visitor.books
 [{:title=>"Harry Potter and the Goblet of Fire",
+  :author=>"J.K. Rowling",
+  :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>},
+ {:title=>"Harry Potter and the Order of the Phoenix",
   :author=>"J.K. Rowling",
   :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>}]
 
 --- Books in the library ---
+# library.list_of_books
 [{:item=>
    {:title=>"Harry Potter and the Philosopher's Stone",
     :author=>"J.K. Rowling"},
@@ -130,8 +146,8 @@ Finished in 0.03219 seconds (files took 0.15021 seconds to load)
  {:item=>
    {:title=>"Harry Potter and the Order of the Phoenix",
     :author=>"J.K. Rowling"},
-  :available=>true,
-  :return_date=>nil},
+  :available=>false,
+  :return_date=>#<Date: 2020-12-01 ((2459185j,0s,0n),+0s,2299161j)>},
  {:item=>
    {:title=>"Harry Potter and the Half-Blood Prince", :author=>"J.K. Rowling"},
   :available=>true,

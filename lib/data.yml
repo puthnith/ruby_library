@@ -22,8 +22,8 @@
 - :item:
     :title: Harry Potter and the Order of the Phoenix
     :author: J.K. Rowling
-  :available: true
-  :return_date:
+  :available: false
+  :return_date: 2020-12-01
 - :item:
     :title: Harry Potter and the Half-Blood Prince
     :author: J.K. Rowling
